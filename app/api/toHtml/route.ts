@@ -1,6 +1,11 @@
-const systemPrompt = `You are an expert tailwind developer. A user will provide you with a
- low-fidelity wireframe of an application and you will return 
+const systemPrompt_Orig = `You are an expert tailwind developer. A user will provide you with a
+ low-fidelity wireframe of an application and you will return
  a single html file that uses tailwind to create the website. Use creative license to make the application more fleshed out.
+if you need to insert an image, use placehold.co to create a placeholder image. Respond only with the html file.`;
+
+const systemPrompt = `You are an expert vue developer and familiar with Ant Design Vue framework. A user will provide you with a
+ low-fidelity wireframe of an application and you will return
+ a single html file that uses Ant Design Vue to create the website. Use creative license to make the application more fleshed out.
 if you need to insert an image, use placehold.co to create a placeholder image. Respond only with the html file.`;
 
 export async function POST(request: Request) {
@@ -20,7 +25,7 @@ export async function POST(request: Request) {
             type: "image_url",
             image_url: image,
           },
-          "Turn this into a single html file using tailwind.",
+          "Turn this into a single html file using Ant Design Vue.",
         ],
       },
     ],
@@ -28,11 +33,29 @@ export async function POST(request: Request) {
 
   let json = null;
   try {
-    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+    const endpoint_openrouter = "https://openrouter.ai/api/v1/chat/completions"
+    const endpoint_openai = "https://api.openai.com/v1/chat/completions"
+    const YOUR_SITE_URL = "http://draw-a-ui.xueshi.io"
+    const YOUR_SITE_NAME = "xueshi's draw-a-ui"
+    console.log("requesting", endpoint_openrouter);
+    console.log("body", JSON.stringify(body))
+
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      "HTTP-Referer": `${YOUR_SITE_URL}`, // To identify your app. Can be set to e.g. http://localhost:3000 for testing
+      "X-Title": `${YOUR_SITE_NAME}`, // Optional. Shows on openrouter.ai
+    };
+
+    console.log("body", JSON.stringify(headers))
+
+    const resp = await fetch(endpoint_openrouter, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "HTTP-Referer": `${YOUR_SITE_URL}`, // To identify your app. Can be set to e.g. http://localhost:3000 for testing
+        "X-Title": `${YOUR_SITE_NAME}`, // Optional. Shows on openrouter.ai
       },
       body: JSON.stringify(body),
     });
